@@ -10,11 +10,11 @@ function:
     include:
       - src/AirWt/**
       - src/shared/**
-  events:
-    - s3:
-        bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
-        event: s3:ObjectCreated:*
-        rules:
-          - prefix: Test/test_air_cw.xml
-          - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
-        existing: true
+  # events:
+  #   - s3:
+  #       bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
+  #       event: s3:ObjectCreated:*
+  #       rules:
+  #         - prefix: Test/test_air_cw.xml
+  #         - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
+  #       existing: true
