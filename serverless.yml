@@ -22,7 +22,7 @@ package:
     - "*.*"
 
 layers:
-  commonfourkitesLibs:
+  OmnifourkitesLayer:
     path: lib
     compatibleRuntimes:
       - nodejs14.x

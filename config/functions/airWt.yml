@@ -3,7 +3,7 @@ function:
   handler: src/AirWt/index.handler
   timeout: 120
   layers:
-    - { Ref: commonfourkitesLibsLambdaLayer }
+    - { Ref: OmnifourkitesLayerLambdaLayer }
   environment:
     BUCKET: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
   package:
