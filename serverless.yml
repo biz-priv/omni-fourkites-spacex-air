@@ -1,0 +1,36 @@
+service: omni-fourkites-spacex-air
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 30
+  stackTags:
+    Application: Omni fourkites spacex air
+    CreateBy: BizCloudExperts
+    Environment: ${self:provider.stage}
+
+package:
+  individually: true
+  exclude:
+    - "node_modules/**"
+    - Jenkinsfile
+    - "config/**"
+    - "src/**"
+    - "*.*"
+
+layers:
+  commonfourkitesLibs:
+    path: lib
+    compatibleRuntimes:
+      - nodejs14.x
+    name: omni-fourkites-layer-${self:provider.stage}
+
+functions:
+  fourkitesCwAir: ${file(config/functions/airWt.yml):function}
+
+plugins:
+  - serverless-offline
+  - serverless-aws-alias-fixed

@@ -1,0 +1,26 @@
+{
+  "name": "omni-fourkites-spacex-air",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.282.0",
+    "@aws-sdk/util-dynamodb": "^3.282.0",
+    "aws-sdk": "^2.1048.0",
+    "axios": "^0.26.1",
+    "joi": "^17.6.0",
+    "moment": "^2.29.4",
+    "moment-timezone": "^0.5.43",
+    "nodemailer": "^6.7.2",
+    "pg": "^8.6.0",
+    "serverless": "2.11.1",
+    "serverless-aws-alias-fixed": "^2.0.1",
+    "serverless-offline": "8.8.0",
+    "xml-js": "^1.6.11"
+  }
+}
