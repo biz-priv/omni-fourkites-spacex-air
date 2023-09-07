@@ -3,6 +3,8 @@ const { xmlToJson, containsUniversalShipment, isTransportModeAir,
   getReferenceNo, callEAdapterAPI, jsonToPayload, sendPayload, putItem
 } = require("../shared/helper.js")
 const momentTZ = require("moment-timezone");
+const sns = new AWS.SNS({ apiVersion: '2010-03-31' });
+
 
 
 module.exports.handler = async (event) => {
