@@ -2,7 +2,7 @@ service: omni-fourkites-spacex-air
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs18.x
   region: ${opt:region, 'us-east-1'}
   stage: ${opt:stage, 'dev'}
   memorySize: 512
@@ -28,9 +28,13 @@ layers:
       - nodejs14.x
     name: omni-fourkites-layer-${self:provider.stage}
 
-functions:
-  fourkitesCwAir: ${file(config/functions/airWt.yml):function}
-
 plugins:
   - serverless-offline
   - serverless-aws-alias-fixed
+  
+functions:
+  fourkitesCwAir: ${file(config/functions/airCw.yml):function}
+
+resources:
+  Resources:
+    SpacexAirLogTable: ${file(config/dynamoDB/spacexLogTable.yml):SpacexAirLogTable}

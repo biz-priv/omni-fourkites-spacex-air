@@ -11,11 +11,7 @@
   "dependencies": {
     "aws-sdk": "^2.1048.0",
     "axios": "^0.26.1",
-    "joi": "^17.6.0",
-    "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
-    "nodemailer": "^6.7.2",
-    "pg": "^8.6.0",
     "xml-js": "^1.6.11"
   }
 }

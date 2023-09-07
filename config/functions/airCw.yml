@@ -1,0 +1,25 @@
+function:
+  name: omni-fourkites-spacex-air-${self:provider.stage}
+  handler: src/AirCw/index.handler
+  timeout: 120
+  layers:
+    - { Ref: OmnifourkitesLayerLambdaLayer }
+  environment:
+    BUCKET: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
+    ERROR_SNS_ARN: ${ssm:/omni-reports/${self:provider.stage}/error-notification/sns/arn}
+    SPACEX_AIR_ENDPOINT: ${ssm:/omni-fourkites/${self:provider.stage}/spacex-air/api/endpoint~true}
+    SPACEX_AIR_APIKEY: ${ssm:/omni-fourkites/${self:provider.stage}/spacex-air/api/key~true}
+    FUNCTION_NAME: omni-fourkites-spacex-air-${self:provider.stage}
+    SPACEX_AIR_LOGS_TABLE: ${ssm:/omni-fourkites/${self:provider.stage}/spacex-logs/ddb.tableName}
+  package:
+    include:
+      - src/AirCw/**
+      - src/shared/**
+  events:
+    - s3:
+        bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
+        event: s3:ObjectCreated:*
+        rules:
+          - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix} #check for prod value
+          - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
+        existing: true
