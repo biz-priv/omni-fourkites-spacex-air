@@ -12,13 +12,13 @@ function:
       - src/AirCw/index.js
       - src/shared/**
   events:
+    - existingS3:
         bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
         events: 
           - s3:ObjectCreated:*
         rules:
           - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix} #check for prod value
           - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
-        existing: true
 
 
   environment:
