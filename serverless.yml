@@ -7,6 +7,12 @@ provider:
   memorySize: 512
   timeout: 30
   role: ${ssm:/omni-dw/${self:provider.stage}/lambda/role}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+      - "s3:GetBucketNotification"
+      - "s3:PutBucketNotification"
+      Resource: "arn:aws:s3:::*"
   stackTags:
     Application: Omni fourkites spacex air
     CreateBy: BizCloudExperts
