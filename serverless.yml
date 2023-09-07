@@ -2,7 +2,6 @@ service: omni-fourkites-spacex-air
 
 provider:
   name: aws
-  runtime: nodejs18.x
   region: ${opt:region, 'us-east-1'}
   stage: ${opt:stage, 'dev'}
   memorySize: 512
@@ -11,6 +10,11 @@ provider:
     Application: Omni fourkites spacex air
     CreateBy: BizCloudExperts
     Environment: ${self:provider.stage}
+
+plugins:
+  - serverless-offline
+  - serverless-aws-alias-fixed
+  - serverless-plugin-existing-s3
 
 package:
   individually: true
@@ -25,12 +29,8 @@ layers:
   OmnifourkitesLayer:
     path: lib
     compatibleRuntimes:
-      - nodejs18.x
+      - nodejs16.x
     name: omni-fourkites-layer-${self:provider.stage}
-
-plugins:
-  - serverless-offline
-  - serverless-aws-alias-fixed
   
 functions:
   fourkitesCwAir: ${file(config/functions/airCw.yml):function}
