@@ -25,7 +25,7 @@ layers:
   OmnifourkitesLayer:
     path: lib
     compatibleRuntimes:
-      - nodejs14.x
+      - nodejs18.x
     name: omni-fourkites-layer-${self:provider.stage}
 
 plugins:
