@@ -7,7 +7,6 @@ provider:
   memorySize: 512
   timeout: 30
   role: ${ssm:/omni-dw/${self:provider.stage}/lambda/role}
-  deploymentBucket: ${ssm:/omni-dw/${self:provider.stage}/sls/deployment/bucket}
   stackTags:
     Application: Omni fourkites spacex air
     CreateBy: BizCloudExperts
