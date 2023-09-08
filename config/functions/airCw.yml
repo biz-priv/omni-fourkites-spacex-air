@@ -11,29 +11,15 @@ function:
     include:
       - src/AirCw/index.js
       - src/shared/**
-  # events:
-  #   - existingS3:
-  #       bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
-  #       events: 
-  #         - s3:ObjectCreated:*
-  #       rules:
-  #         - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix} #check for prod value
-  #         - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
-  Events:
-    NotificationEvent:
-      Type: S3
-      Properties:
-        Bucket:  ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
-        Events: s3:ObjectCreated:*
-        Filter:
-          S3Key:
-            Rules:
-              - Name: prefix
-                Value: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix}
-              - Name: suffix
-                Value: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
+  events:
+    - s3: 
+        bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
+        event: s3:ObjectCreated:*
+        rules:
+          - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix}
+          - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
+        existing: true
 
-                
   environment:
     BUCKET: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
     ERROR_SNS_ARN: ${ssm:/omni-reports/${self:provider.stage}/error-notification/sns/arn}
