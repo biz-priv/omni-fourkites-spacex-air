@@ -6,6 +6,7 @@ provider:
   stage: ${opt:stage, 'dev'}
   memorySize: 512
   timeout: 30
+  runtime: nodejs18.x
   role: ${ssm:/omni-dw/${self:provider.stage}/lambda/role}
   
   stackTags:
