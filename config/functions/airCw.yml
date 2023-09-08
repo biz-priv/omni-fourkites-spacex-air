@@ -25,7 +25,6 @@ function:
     ERROR_SNS_ARN: ${ssm:/omni-reports/${self:provider.stage}/error-notification/sns/arn}
     SPACEX_AIR_ENDPOINT: ${ssm:/omni-fourkites/${self:provider.stage}/spacex-air/api/endpoint~true}
     SPACEX_AIR_APIKEY: ${ssm:/omni-fourkites/${self:provider.stage}/spacex-air/api/key~true}
-    FUNCTION_NAME: omni-fourkites-spacex-air-${self:provider.stage}
     SPACEX_AIR_LOGS_TABLE: ${ssm:/omni-fourkites/${self:provider.stage}/spacex-logs/ddb.tableName}
     EADAPTER_URL: ${ssm:/omni-dw/${self:provider.stage}/wms/adapter/url}
     EADAPTER_USERNAME: ${ssm:/omni-dw/${self:provider.stage}/wms/adapter/password}

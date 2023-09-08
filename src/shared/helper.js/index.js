@@ -23,7 +23,7 @@ function containsUniversalShipment(jsonObject) {
         if (!jsonObject || !get(jsonObject, 'UniversalInterchange.Body.UniversalShipment')) {
             throw new Error("Invalid JSON object");
         }
-        console.log("jsonObject is not null", get(jsonObject, 'UniversalInterchange.Body.UniversalShipment') !== null);
+        console.info("jsonObject is not null", get(jsonObject, 'UniversalInterchange.Body.UniversalShipment') !== null);
         return get(jsonObject, 'UniversalInterchange.Body.UniversalShipment') !== null;
     } catch (error) {
         console.error(error);
@@ -107,10 +107,10 @@ async function callEAdapterAPI(jsonObject) {
         }
 
         const jsonResponse = await xmlToJson(response.data);
-        console.log("jsonResponse:", jsonResponse);
+        console.info("jsonResponse:", jsonResponse);
 
         const transportMode = getTransportMode(jsonResponse);
-        console.log("transportMode:", transportMode);
+        console.info("transportMode:", transportMode);
 
         return transportMode;
     } catch (error) {
@@ -260,7 +260,7 @@ async function sendPayload(payload) {
     };
     try {
         const response = await axios.request(config);
-        console.log("Payload is sent successfully", JSON.stringify(response.data));
+        console.info("Payload is sent successfully", JSON.stringify(response.data));
         return {
             success: true,
             errorMsg: "",

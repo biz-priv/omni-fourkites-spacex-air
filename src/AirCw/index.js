@@ -8,7 +8,7 @@ const sns = new AWS.SNS({ apiVersion: '2010-03-31' });
 
 
 
-module.exports.handler = async (event) => {
+module.exports.handler = async (event,context) => {
   try {
     console.info("Event: \n", JSON.stringify(event));
     let objectKey = decodeURIComponent(
@@ -25,7 +25,7 @@ module.exports.handler = async (event) => {
     // Step 3: Checking if XML contains Universal shipment and transport mode is AIR
     if (containsUniversalShipment(jsonObject) && isTransportModeAir(jsonObject)) {
       const transportMode = isTransportModeAir(jsonObject);
-      console.log("Transport Mode is AIR", transportMode);
+      console.info("Transport Mode is AIR", transportMode);
     } else {
       // Step 4: Call eAdapter API to fetch transport mode
       const transportMode = await callEAdapterAPI(jsonObject);
@@ -39,12 +39,11 @@ module.exports.handler = async (event) => {
 
     // Step 5: Converting JSON to payload
     const payload = await jsonToPayload(jsonObject);
-    console.log("payload:", JSON.stringify(payload));
+    console.info("payload:", JSON.stringify(payload));
     const insertedTimeStamp = momentTZ
       .tz("America/Chicago")
       .format("YYYY:MM:DD HH:mm:ss")
       .toString();
-
     // Step 6: Sending payload to external api
     const { errorMsg, responseStatus } = await sendPayload(payload);
 
@@ -60,12 +59,11 @@ module.exports.handler = async (event) => {
     // Step 7: Log the data in DynamoDB
     await putItem(process.env.SPACEX_AIR_LOGS_TABLE, logItem);
     console.info("End of the function");
-
   } catch (error) {
     // Send a notification to the SNS topic
     const params = {
-      Message: `An error occurred in function ${process.env.FUNCTION_NAME}. Error details: ${error}.`,
-      Subject: `Lambda function ${process.env.FUNCTION_NAME} has failed.`,
+      Message: `An error occurred in function ${context.functionName}. Error details: ${error}.`,
+      Subject: `Lambda function ${context.functionName} has failed.`,
       TopicArn: process.env.ERROR_SNS_ARN,
     };
 
