@@ -1,17 +1,11 @@
 const AWS = require("aws-sdk");
 const convert = require("xml-js");
-const axios = require("axios")
+const axios = require("axios");
 const dynamodb = new AWS.DynamoDB.DocumentClient();
-
-
-
+const { get } = require('lodash');
 
 async function xmlToJson(xml) {
     try {
-        if (!xml) {
-            throw new Error("Invalid XML input");
-        }
-
         xml = xml.toString("utf-8");
         xml = xml.replace("&", "*AND*");
 
@@ -26,11 +20,11 @@ async function xmlToJson(xml) {
 
 function containsUniversalShipment(jsonObject) {
     try {
-        if (!jsonObject || !jsonObject.UniversalInterchange.Body.UniversalShipment) {
+        if (!jsonObject || !get(jsonObject, 'UniversalInterchange.Body.UniversalShipment')) {
             throw new Error("Invalid JSON object");
         }
-        console.log("jsonObject is not null", jsonObject.UniversalInterchange.Body.UniversalShipment != null);
-        return jsonObject.UniversalInterchange.Body.UniversalShipment != null;
+        console.log("jsonObject is not null", get(jsonObject, 'UniversalInterchange.Body.UniversalShipment') !== null);
+        return get(jsonObject, 'UniversalInterchange.Body.UniversalShipment') !== null;
     } catch (error) {
         console.error(error);
         throw error;
@@ -39,10 +33,10 @@ function containsUniversalShipment(jsonObject) {
 
 function isTransportModeAir(jsonObject) {
     try {
-        if (!jsonObject || !jsonObject.UniversalInterchange.Body.UniversalShipment || !jsonObject.UniversalInterchange.Body.UniversalShipment.Shipment) {
+        if (!jsonObject || !get(jsonObject, 'UniversalInterchange.Body.UniversalShipment.Shipment')) {
             throw new Error("Invalid JSON object or missing shipment data");
         }
-        return jsonObject.UniversalInterchange.Body.UniversalShipment.Shipment.TransportMode.Code._text === 'AIR';
+        return get(jsonObject, 'UniversalInterchange.Body.UniversalShipment.Shipment.TransportMode.Code._text') === 'AIR';
     } catch (error) {
         console.error(error);
         throw error;
@@ -51,14 +45,14 @@ function isTransportModeAir(jsonObject) {
 
 function getReferenceNo(jsonObject) {
     try {
-        const shipment = jsonObject?.UniversalInterchange?.Body?.UniversalShipment?.Shipment;
+        const shipment = get(jsonObject, 'UniversalInterchange.Body.UniversalShipment.Shipment');
         let reference = null;
-        if (shipment?.SubShipmentCollection?.SubShipment) {
-            if (Array.isArray(shipment.SubShipmentCollection.SubShipment)) {
-                reference = shipment.SubShipmentCollection.SubShipment[0]?.DataContext?.DataSourceCollection?.DataSource?.Key?._text ?? null;
+        if (get(shipment, 'SubShipmentCollection.SubShipment')) {
+            if (Array.isArray(get(shipment, 'SubShipmentCollection.SubShipment'))) {
+                reference = get(shipment, 'SubShipmentCollection.SubShipment[0].DataContext.DataSourceCollection.DataSource.Key._text', null);
             } else {
-                const dataSources = Array.isArray(shipment.SubShipmentCollection.SubShipment.DataContext?.DataSourceCollection?.DataSource) ? shipment.SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource : [shipment.SubShipmentCollection.SubShipment.DataContext?.DataSourceCollection?.DataSource];
-                reference = dataSources[0]?.Key?._text ?? null;
+                const dataSources = Array.isArray(get(shipment, 'SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource')) ? get(shipment, 'SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource') : [get(shipment, 'SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource', null)];
+                reference = get(dataSources, '[0].Key._text', null);
             }
         }
         return reference;
@@ -94,13 +88,17 @@ function generateXmlBody(jsonObject) {
 
 async function callEAdapterAPI(jsonObject) {
     try {
-        const endpoint = 'https://trxts2services.wisegrid.net/eAdaptor';
+        const endpoint = process.env.EADAPTER_URL;
         const xmlBody = generateXmlBody(jsonObject);
+
+        const username = process.env.EADAPTER_USERNAME;
+        const password = process.env.EADAPTER_PASSWORD;
+        const auth = Buffer.from(`${username}:${password}`, 'utf8').toString('base64');
 
         const response = await axios.post(endpoint, xmlBody, {
             headers: {
                 'Content-Type': 'application/xml',
-                Authorization: 'Basic dHJ4dHMyOjY0ODg1Nw==',
+                Authorization: `Basic ${auth}`,
             },
         });
 
@@ -121,11 +119,9 @@ async function callEAdapterAPI(jsonObject) {
     }
 }
 
-
-
 function getTransportMode(jsonResponse) {
     try {
-        return jsonResponse?.UniversalResponse?.Data?.UniversalShipment?.Shipment?.TransportMode.Code._text;
+        return get(jsonResponse, 'UniversalResponse.Data.UniversalShipment.Shipment.TransportMode.Code._text');
     } catch (error) {
         console.error(error);
         throw error;
@@ -134,38 +130,37 @@ function getTransportMode(jsonResponse) {
 
 async function jsonToPayload(jsonObject) {
     try {
-
-        if (!jsonObject || !jsonObject.UniversalInterchange.Body.UniversalShipment || !jsonObject.UniversalInterchange.Body.UniversalShipment.Shipment) {
+        if (!jsonObject || !get(jsonObject, 'UniversalInterchange.Body.UniversalShipment.Shipment')) {
             throw new Error('Invalid input: missing shipment data');
         }
 
-        const shipment = jsonObject.UniversalInterchange.Body.UniversalShipment.Shipment;
+        const shipment = get(jsonObject, 'UniversalInterchange.Body.UniversalShipment.Shipment');
 
         let reference = null;
-        if (shipment.SubShipmentCollection?.SubShipment) {
-            if (Array.isArray(shipment.SubShipmentCollection.SubShipment)) {
-                reference = shipment.SubShipmentCollection.SubShipment[0]?.DataContext?.DataSourceCollection?.DataSource?.Key?._text ?? reference;
+        if (get(shipment, 'SubShipmentCollection.SubShipment')) {
+            if (Array.isArray(get(shipment, 'SubShipmentCollection.SubShipment'))) {
+                reference = get(shipment, 'SubShipmentCollection.SubShipment[0].DataContext.DataSourceCollection.DataSource.Key._text', null);
             } else {
-                const dataSources = Array.isArray(shipment.SubShipmentCollection.SubShipment.DataContext?.DataSourceCollection?.DataSource) ? shipment.SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource : [shipment.SubShipmentCollection.SubShipment.DataContext?.DataSourceCollection?.DataSource];
-                reference = dataSources[0]?.Key?._text ?? reference;
+                const dataSources = Array.isArray(get(shipment, 'SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource')) ? get(shipment, 'SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource') : [get(shipment, 'SubShipmentCollection.SubShipment.DataContext.DataSourceCollection.DataSource', null)];
+                reference = get(dataSources, '[0].Key._text', null);
             }
         }
-        // console.log(shipment.SubShipmentCollection.SubShipment[0].DataContext.DataSourceCollection.DataSource.Key._text)
-        const Delivered = shipment.SubShipmentCollection.SubShipment.LocalProcessing?.DeliveryCartageCompleted?._text ?? null
-        const total_number_of_pieces = parseInt(shipment.OuterPacks?._text) || null;
+
+        const Delivered = get(shipment, 'SubShipmentCollection.SubShipment.LocalProcessing.DeliveryCartageCompleted._text', null);
+        const total_number_of_pieces = parseInt(get(shipment, 'OuterPacks._text')) || null;
         const destination = shipment.PortOfDischarge?.Code?._text?.substring(2) ?? null;
         const origin = shipment.PortOfLoading?.Code?._text?.substring(2) ?? null;
-        const number_of_pieces = parseInt(shipment.TotalNoOfPacks?._text) || null;
-        let deliveryToName = shipment.SubShipmentCollection.SubShipment.CustomizedFieldCollection.CustomizedField[1].Value?._text ?? null;
+        const number_of_pieces = parseInt(get(shipment, 'TotalNoOfPacks._text')) || null;
+        let deliveryToName = get(shipment, 'SubShipmentCollection.SubShipment.CustomizedFieldCollection.CustomizedField[1].Value._text', null);
 
         const weight = {
-            amount: parseInt(shipment.TotalWeight?._text) || null,
-            unit: shipment.TotalWeightUnit?.Code?._text ?? null
+            amount: parseInt(get(shipment, 'TotalWeight._text')) || null,
+            unit: get(shipment, 'TotalWeightUnit.Code._text', null)
         };
-        const air_waybill_number = shipment.WayBillNumber?._text ?? null;
+        const air_waybill_number = get(shipment, 'WayBillNumber._text', null);
         let events = [];
-        if (shipment.TransportLegCollection && shipment.TransportLegCollection.TransportLeg) {
-            let transportLegs = shipment.TransportLegCollection.TransportLeg;
+        if (get(shipment, 'TransportLegCollection.TransportLeg')) {
+            let transportLegs = get(shipment, 'TransportLegCollection.TransportLeg');
             if (!Array.isArray(transportLegs)) {
                 transportLegs = [transportLegs];
             }
@@ -174,38 +169,38 @@ async function jsonToPayload(jsonObject) {
                     destination: transport_leg.PortOfDischarge?.Code?._text?.substring(2) ?? null,
                     origin: transport_leg.PortOfLoading?.Code?._text?.substring(2) ?? null,
                 };
-                if (transport_leg.ScheduledDeparture?._text) {
+                if (get(transport_leg, 'ScheduledDeparture._text')) {
                     const bookedEvent = {
                         type: "booked",
                         ...commonEventData,
-                        timeOfEvent: transport_leg.ScheduledDeparture._text,
-                        estimatedTimeOfArrival: transport_leg.EstimatedArrival?._text ?? null,
-                        dateOfScheduledDeparture: transport_leg.EstimatedDeparture?._text ?? null,
-                        timeOfScheduledArrival: transport_leg.ScheduledArrival?._text ?? null,
-                        timeOfScheduledDeparture: transport_leg.ScheduledDeparture._text,
-                        flight: transport_leg.VoyageFlightNo?._text ?? null
+                        timeOfEvent: get(transport_leg, 'ScheduledDeparture._text'),
+                        estimatedTimeOfArrival: get(transport_leg, 'EstimatedArrival._text', null),
+                        dateOfScheduledDeparture: get(transport_leg, 'EstimatedDeparture._text', null),
+                        timeOfScheduledArrival: get(transport_leg, 'ScheduledArrival._text', null),
+                        timeOfScheduledDeparture: get(transport_leg, 'ScheduledDeparture._text', null),
+                        flight: get(transport_leg, 'VoyageFlightNo._text', null)
                     };
                     events.push(bookedEvent);
                 }
 
-                if (transport_leg.ActualDeparture?._text) {
+                if (get(transport_leg, 'ActualDeparture._text')) {
                     const departedEvent = {
                         type: "departed",
                         ...commonEventData,
-                        timeOfEvent: transport_leg.ActualDeparture._text,
-                        estimatedTimeOfArrival: transport_leg.EstimatedArrival?._text ?? null,
-                        timeOfScheduledArrival: transport_leg.ScheduledArrival?._text ?? null,
-                        flight: transport_leg.VoyageFlightNo?._text ?? null
+                        timeOfEvent: get(transport_leg, 'ActualDeparture._text', null),
+                        estimatedTimeOfArrival: get(transport_leg, 'EstimatedArrival._text', null),
+                        timeOfScheduledArrival: get(transport_leg, 'ScheduledArrival._text', null),
+                        flight: get(transport_leg, 'VoyageFlightNo._text', null)
                     };
                     events.push(departedEvent);
                 }
 
-                if (transport_leg.ActualArrival?._text) {
+                if (get(transport_leg, 'ActualArrival._text')) {
                     const arrivedEvent = {
                         type: "arrived",
                         ...commonEventData,
-                        timeOfEvent: transport_leg.ActualArrival._text,
-                        flight: transport_leg.VoyageFlightNo?._text ?? null
+                        timeOfEvent: get(transport_leg, 'ActualArrival._text', null),
+                        flight: get(transport_leg, 'VoyageFlightNo._text', null)
                     };
                     events.push(arrivedEvent);
                 }
@@ -245,18 +240,19 @@ async function jsonToPayload(jsonObject) {
     }
 }
 
-async function sendPayload(payload) {
 
+
+async function sendPayload(payload) {
     let data = JSON.stringify(payload);
 
     let config = {
         method: 'post',
         maxBodyLength: Infinity,
-        url: 'https://api.fourkites.com/data-providers/events/async',
+        url: process.env.SPACEX_AIR_ENDPOINT,
         headers: {
             'eventType': 'airMilestoneUpdate',
             'Content-Type': 'application/json',
-            'apikey': 'JKT5RI8LG4EPL87L2REK3A1T3TII9',
+            'apikey': process.env.SPACEX_AIR_APIKEY,
             'Connection': 'keep-alive',
             'Accept': 'application/json'
         },
@@ -274,8 +270,8 @@ async function sendPayload(payload) {
         console.error(error);
         return {
             success: false,
-            errorMsg: error.response.data.errors[0].message,
-            responseStatus: error.response.status
+            errorMsg: get(error, 'response.data.errors[0].message', ''),
+            responseStatus: get(error, 'response.status', 0)
         };
     }
 }
@@ -290,7 +286,6 @@ async function putItem(tableName, item) {
         return await dynamodb.put(params).promise();
     } catch (e) {
         console.error("Put Item Error: ", e, "\nPut params: ", params);
-        throw "PutItemError";
     }
 }
 

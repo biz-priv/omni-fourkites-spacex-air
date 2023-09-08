@@ -55,10 +55,11 @@ module.exports.handler = async (event) => {
       ErrorMsg: errorMsg,
       InsertedTimeStamp: insertedTimeStamp,
     };
-    console.log("logItem:", logItem);
+    console.info("logItem:", logItem);
 
     // Step 7: Log the data in DynamoDB
     await putItem(process.env.SPACEX_AIR_LOGS_TABLE, logItem);
+    console.info("End of the function");
 
   } catch (error) {
     // Send a notification to the SNS topic

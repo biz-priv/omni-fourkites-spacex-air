@@ -13,6 +13,7 @@
     "@aws-sdk/util-dynamodb": "^3.282.0",
     "aws-sdk": "^2.1048.0",
     "axios": "^0.26.1",
+    "lodash": "^4.17.21",
     "moment-timezone": "^0.5.43",
     "serverless": "2.11.1",
     "serverless-aws-alias-fixed": "^2.0.1",
