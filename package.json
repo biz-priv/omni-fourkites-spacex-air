@@ -14,7 +14,7 @@
     "aws-sdk": "^2.1048.0",
     "axios": "^0.26.1",
     "moment-timezone": "^0.5.43",
-    "serverless": "2.11.1",
+    "serverless": "^3.34.0",
     "serverless-aws-alias-fixed": "^2.0.1",
     "serverless-offline": "8.8.0",
     "xml-js": "^1.6.11"

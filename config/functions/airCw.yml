@@ -19,7 +19,6 @@ function:
           - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix}
           - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
         existing: true
-        forceDeploy: true
   environment:
     BUCKET: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
     ERROR_SNS_ARN: ${ssm:/omni-reports/${self:provider.stage}/error-notification/sns/arn}
