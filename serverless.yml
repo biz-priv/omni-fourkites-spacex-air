@@ -1,0 +1,43 @@
+service: omni-fourkites-spacex-air
+
+provider:
+  name: aws
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 512
+  timeout: 30
+  runtime: nodejs18.x
+  role: ${ssm:/omni-dw/${self:provider.stage}/lambda/role}
+  
+  stackTags:
+    Application: Omni fourkites spacex air
+    CreateBy: BizCloudExperts
+    Environment: ${self:provider.stage}
+
+plugins:
+  - serverless-offline
+  - serverless-aws-alias-fixed
+  - serverless-plugin-existing-s3
+
+package:
+  individually: true
+  exclude:
+    - "node_modules/**"
+    - Jenkinsfile
+    - "config/**"
+    - "src/**"
+    - "*.*"
+
+layers:
+  OmnifourkitesLayer:
+    path: lib
+    compatibleRuntimes:
+      - nodejs18.x
+    name: omni-fourkites-layer-${self:provider.stage}
+  
+functions:
+  fourkitesCwAir: ${file(config/functions/airCw.yml):function}
+
+resources:
+  Resources:
+    SpacexAirLogTable: ${file(config/dynamoDB/spacexLogTable.yml):SpacexAirLogTable}
