@@ -17,6 +17,7 @@ provider:
 plugins:
   - serverless-offline
   - serverless-aws-alias-fixed
+  - serverless-plugin-existing-s3
 
 package:
   individually: true

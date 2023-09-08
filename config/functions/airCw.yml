@@ -3,22 +3,23 @@ function:
   name: omni-fourkites-spacex-air-${self:provider.stage}
   handler: src/AirCw/index.handler
   timeout: 120
-  runtime: nodejs18.x
+  runtime: nodejs16.x
   layers:
     - { Ref: OmnifourkitesLayerLambdaLayer }
 
   package:
     include:
-      - src/AirCw/**
+      - src/AirCw/index.js
       - src/shared/**
   events:
-    - s3: 
+    - existingS3:
         bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
-        event: s3:ObjectCreated:*
+        events: 
+          - s3:ObjectCreated:*
         rules:
-          - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix}
+          - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix} #check for prod value
           - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
-        existing: true
+
   environment:
     BUCKET: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
     ERROR_SNS_ARN: ${ssm:/omni-reports/${self:provider.stage}/error-notification/sns/arn}
