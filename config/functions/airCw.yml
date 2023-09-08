@@ -11,14 +11,14 @@ function:
     include:
       - src/AirCw/**
       - src/shared/**
-  # events:
-  #   - s3: 
-  #       bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
-  #       event: s3:ObjectCreated:*
-  #       rules:
-  #         - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix}
-  #         - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
-  #       existing: true
+  events:
+    - s3: 
+        bucket: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
+        event: s3:ObjectCreated:*
+        rules:
+          - prefix: ${ssm:/omni-dw-fourkites/${self:provider.stage}/spacex-air/s3-prefix}
+          - suffix: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/rules/suffix}
+        existing: true
   environment:
     BUCKET: ${ssm:/omni-dw/${self:provider.stage}/wms/bucket/name}
     ERROR_SNS_ARN: ${ssm:/omni-reports/${self:provider.stage}/error-notification/sns/arn}
