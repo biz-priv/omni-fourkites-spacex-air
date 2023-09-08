@@ -50,7 +50,7 @@ module.exports.handler = async (event) => {
 
     const logItem = {
       ShipmentId: payload.reference,
-      Payload: payload,
+      Payload: JSON.stringify(payload),
       ApiStatusCode: responseStatus,
       ErrorMsg: errorMsg,
       InsertedTimeStamp: insertedTimeStamp,
