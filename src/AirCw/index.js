@@ -1,3 +1,4 @@
+const AWS = require("aws-sdk");
 const { getXMLfromS3 } = require("../shared/s3/index");
 const { xmlToJson, containsUniversalShipment, isTransportModeAir,
   getReferenceNo, callEAdapterAPI, jsonToPayload, sendPayload, putItem
