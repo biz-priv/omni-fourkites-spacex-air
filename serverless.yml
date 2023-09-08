@@ -30,7 +30,7 @@ layers:
   OmnifourkitesLayer:
     path: lib
     compatibleRuntimes:
-      - nodejs16.x
+      - nodejs18.x
     name: omni-fourkites-layer-${self:provider.stage}
   
 functions:

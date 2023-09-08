@@ -3,7 +3,7 @@ function:
   name: omni-fourkites-spacex-air-${self:provider.stage}
   handler: src/AirCw/index.handler
   timeout: 120
-  runtime: nodejs16.x
+  runtime: nodejs18.x
   layers:
     - { Ref: OmnifourkitesLayerLambdaLayer }
 
