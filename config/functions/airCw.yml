@@ -9,7 +9,7 @@ function:
 
   package:
     include:
-      - src/AirCw/index.js
+      - src/AirCw/**
       - src/shared/**
   events:
     - s3: 
