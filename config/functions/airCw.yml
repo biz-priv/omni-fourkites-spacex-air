@@ -4,6 +4,8 @@ function:
   handler: src/AirCw/index.handler
   timeout: 120
   runtime: nodejs16.x
+  tags:
+    Name : AirCw
   layers:
     - { Ref: OmnifourkitesLayerLambdaLayer }
 
