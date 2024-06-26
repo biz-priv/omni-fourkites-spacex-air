@@ -1,3 +1,10 @@
+/*
+* File: src\shared\helper.js\index.js
+* Project: Omni-fourkites-spacex-air
+* Author: Bizcloud Experts
+* Date: 2024-09-09
+* Confidential and Proprietary
+*/
 const AWS = require("aws-sdk");
 const convert = require("xml-js");
 const axios = require("axios");

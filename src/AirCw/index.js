@@ -1,3 +1,10 @@
+/*
+* File: src\AirCw\index.js
+* Project: Omni-fourkites-spacex-air
+* Author: Bizcloud Experts
+* Date: 2024-09-09
+* Confidential and Proprietary
+*/
 const AWS = require("aws-sdk");
 const { getXMLfromS3 } = require("../shared/s3/index");
 const { xmlToJson, containsUniversalShipment, isTransportModeAir,
